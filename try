@@ -1,0 +1,16 @@
+#!/bin/bash
+
+LOG=~/try.log
+
+log() {
+  TYPE=$1
+  shift
+  D=$(date '+%d%m%y_%H:%M:%S')
+  echo "$TYPE $D $@" >> $LOG
+
+}
+
+
+log TEST stuff here
+sleep 1
+log TRY next stuff

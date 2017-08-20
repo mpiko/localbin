@@ -1,0 +1,34 @@
+#!/bin/bash
+set -x
+IFS="
+"
+
+SENT=$(grep "^sent" /data/maffra/backup_20-08-17_00-03.log | gawk '{print $2}' | sed 's/,//g')
+tot=0
+for i in $SENT
+do
+  tot=$(calc $tot + $i | sed 's/[ \t]*//')
+done
+echo $tot
+
+if [ $tot -gt 1099511627776 ]
+then
+  tot=$(calc $tot / 1099511627776)
+  MUL="T"
+elif [ $tot -gt 1073741824 ]
+then
+  tot=$(calc $tot / 1073741824)
+  MUL="G"
+elif [ $tot -gt 1048576 ]
+then
+  tot=$(calc $tot / 1048576)
+  MUL="m"
+elif [ $tot -gt 1024 ]
+then
+  tot=$(calc $tot / 1024)
+  MUL="k"
+fi
+
+tot=$(echo $tot | sed 's/~//'| gawk '{print $1}' )
+whole=$(echo $tot | cut -f1 -d.)
+echo $whole$MUL

@@ -1,0 +1,31 @@
+#!/bin/bash
+
+EPISODE=$1
+EXT=mkv
+NAME="Game of Thrones $EPISODE.$EXT"
+#WHERE="/exports/media/TV Shows/Simpsons/Simpsons Season 28"
+WHERE="/media/michael/USB/media/TV Shows/Game of Thrones/Season 6"
+if [ $# -ne 1 ]
+then
+   echo Usage: $0 SxxEnn
+   exit 2
+fi
+
+TMP=$(ls -1 *$EPISODE*.$EXT 2> /dev/null | wc -l | awk '{print $1}' 2> /dev/null)
+if [ $TMP -eq 0 ] 
+then
+  exit
+fi
+#echo $NAME
+#exit
+
+[ -d "$WHERE" ] || mkdir "$WHERE"
+
+echo Renaming *$EPISODE*.$EXT to "$NAME"
+
+mv *$EPISODE*.$EXT "$NAME"
+
+echo Moving "$NAME" to "$WHERE"
+mv "$NAME" "$WHERE"
+
+ls -lh "$WHERE" 

@@ -1,0 +1,5 @@
+#!/bin/bash
+IFS="
+"
+for i in $(find . -type d); do  echo $i; chmod 755 "$i"; done
+for i in $(find . -type f); do  echo $i; chmod 644 "$i"; done

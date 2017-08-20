@@ -1,0 +1,132 @@
+#!/bin/bash
+
+TURNOFF=Y
+OFFFILE=/home/michael/off.txt
+PATH=$PATH:/home/michael/localbin
+LOCK=/tmp/backup.lock
+DATE=$(date)
+STARTTIME=$(date '+%s')
+LOGDATE=$(date '+%d-%m-%y_%H-%M')
+ERRORLOG=/home/michael/backuperror.log
+WORKINGFOLDER=/data/maffra
+LOG=$WORKINGFOLDER/backup_$LOGDATE.log
+
+log() {
+  TYPE=$1
+  shift
+  D=$(date '+%d-%m-%y_%H:%M:%S')
+  echo "$TYPE $D $@" >> $LOG
+
+}
+
+if [ -e $LOCK ]
+then
+  PID=$(head -1 $LOCK)
+  STARTED=$(tail -1 $LOCK)
+  RUNNING=$(ps ax | sed 's/^ //'| grep "^$PID" | gawk '{print $1}')
+  echo "$DATE" >> $ERRORLOG
+  if [ -z $RUNNING ]
+  then
+    echo "removing stale lock file $PID" >> $ERRORLOG
+    rm $LOCK
+  else
+    echo "Backup already running" >> $ERRORLOG
+    echo "Process locked on: $STARTED" >> $ERRORLOG
+    exit 2
+  fi
+fi
+
+echo "$$" > $LOCK
+echo "$DATE" >> $LOCK
+
+if [ ! -e $WORKINGFOLDER ]
+then
+  echo $DATE >> $ERRORLOG
+  echo "Cannot change to working folder: $WORKINGFOLDER" >> $ERRORLOG
+  echo "Aboring" >> $ERRORLOG
+  exit 2
+fi
+
+log Start:
+
+cd $WORKINGFOLDER
+
+clean() {
+  TYPE=$1
+  j=0
+  for i in $(ls -1t *.$TYPE)
+  do
+    j=$(calc $j + 1)
+    if [ $j -le 4 ]
+    then
+      continue
+    fi
+    log Clean: Removing $i
+    sudo rm "$i"
+  done 
+}
+
+ismounted() {
+  if [ -z $(mount | grep -w $1 | sed 's/ *//g') ]
+  then
+    return 2
+  fi
+  return 0
+}
+
+clean log
+clean tgz
+
+
+sudo tar zcfp $WORKINGFOLDER/maffra_etc_$LOGDATE.tgz /etc 2> /dev/null
+
+
+log Rsync:
+DEST=/media/michael/medback
+if ismounted $DEST
+then
+  log Rsync: $DEST is mounted
+  log Rsync: rsync -axv /data/media/ $DEST/ --delete
+  nice rsync -axv /data/media/ $DEST/ --delete | grep -v "/$" >> $LOG 2> /dev/null
+else
+  log Rsync: $DEST could not be found
+fi
+
+log Rsync:
+DEST=/backup
+if ismounted $DEST
+then
+  log Rsync: $DEST is mounted
+  log Rsync: "rsync -axv /data/ $DEST/ --delete --exclude media --exclude lost+found"
+  nice rsync -axv /data/ $DEST/ --delete --exclude media --exclude lost+found | grep -v "/$" >> $LOG 2> /dev/null 
+else
+  log Rsync: $DEST could not be found
+fi
+
+log Rsync:
+DEST=/backup
+if ismounted $DEST
+then
+  log Rsync: "$DEST is mounted"
+  log Rsync: "rsync -axv /home/michael $DEST/home/ --delete"
+  nice rsync -axv /home/michael $DEST/home/ --delete | grep -v "/$" >> $LOG 2> /dev/null 
+else
+  log Rsync: "$DEST could not be found"
+fi
+
+DATE=$(date)
+ENDTIME=$(date '+%s')
+ELAPSE=$(calc $ENDTIME - $STARTTIME)
+TIME=$(showtime $ELAPSE)
+log "Finish:"
+log Finish: "Elapsed time: $TIME"
+rm $LOCK
+
+if [ $TURNOFF == 'Y' ]
+then
+  if [ -f $OFFFILE ]
+  then
+    rm $OFFFILE
+    sudo shutdown -h now
+  fi
+fi

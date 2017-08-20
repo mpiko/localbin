@@ -1,0 +1,92 @@
+#!/bin/bash
+FILE=$1
+WKDIR=/data/maffra
+if [ -z $FILE ]
+then
+  FILE=file
+fi
+
+readablenum() {
+  tot=$1
+  if [ $tot -gt 1099511627776 ]
+  then
+    tot=$(calc $tot / 1099511627776)
+    MUL="T"
+  elif [ $tot -gt 1073741824 ]
+  then
+    tot=$(calc $tot / 1073741824)
+    MUL="G"
+  elif [ $tot -gt 1048576 ]
+  then
+    tot=$(calc $tot / 1048576)
+    MUL="m"
+  elif [ $tot -gt 1024 ]
+  then
+    tot=$(calc $tot / 1024)
+    MUL="k"
+  fi
+  
+  tot=$(echo $tot | sed 's/~//'| gawk '{print $1}' )
+  whole=$(echo $tot | cut -f1 -d.)
+  echo $whole$MUL
+}
+
+while [ ! -f $FILE ]
+do
+  echo ""
+  echo "$FILE not found"
+  echo Working Directory: $WKDIR
+  echo ""
+  echo "FIles available:"
+  cd $WKDIR
+  LOGS=$(ls -1 *.log)
+  declare -A FILELIST
+  j=0
+  for i in $LOGS
+  do 
+    j=$(calc $j + 1 | gawk '{print $1}')
+    echo "    $j - $i"
+    FILELIST[$j]=$i
+  done
+  echo -n "which log file would you like? (1-$j) "
+  read n
+  FILE=$WKDIR/${FILELIST[$n]}
+  echo FILE = $FILE
+done
+
+
+SIZE=$(wc -l $FILE | gawk '{print $1}')
+echo ""
+echo $FILE has $SIZE lines
+grep "^Start" $FILE
+grep "^Clean" $FILE
+echo ""
+grep "^[Rr]sync" $FILE
+echo ""
+grep "^Finish" $FILE
+grep "^Elapsed" $FILE
+
+echo ""
+DEL=$(grep "^deleting" $FILE | wc -l | gawk '{print $1}')
+echo "Deleted: $DEL files were removed from backup"
+ADD=$(grep -v ":" $FILE | grep "/" | grep -v "^sent" | grep -v "^deleting" | wc -l | gawk '{print $1}')
+echo "Updated: $ADD new or updated files to backup"
+
+SENT=$(grep "^sent" $FILE | gawk '{print $2}' | sed 's/,//g')
+tot=0
+for i in $SENT
+do
+  tot=$(calc $tot + $i | sed 's/[ \t]*//')
+done
+echo -n "Total size of new or updated files: "
+readablenum $tot
+
+echo ""
+echo -n "Would you like to view the log? (yN) "
+read view
+[ -z $view ] && view=n
+
+if [ $view == "Y" ] || [ $view == "y" ]
+then
+  more $FILE
+fi

@@ -1,0 +1,4 @@
+#!/bin/bash
+IFS="
+"
+for i in $(find /data/ -iname Thumbs.db 2> /dev/null); do  echo $i; rm "$i"; done

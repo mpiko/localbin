@@ -1,0 +1,7 @@
+#!/bin/bash
+
+
+for I in $(torrentSequence 10)
+do
+  torrentRename $I
+done
