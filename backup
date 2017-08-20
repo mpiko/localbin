@@ -53,11 +53,13 @@ cd $WORKINGFOLDER
 
 clean() {
   TYPE=$1
+  EXT=$2
+  KEEPLOGS=$3
   j=0
-  for i in $(ls -1t *.$TYPE)
+  for i in $(ls -1t $TYPE*.$EXT)
   do
     j=$(calc $j + 1)
-    if [ $j -le 4 ]
+    if [ $j -le $KEEPLOGS ]
     then
       continue
     fi
@@ -74,11 +76,13 @@ ismounted() {
   return 0
 }
 
-clean log
-clean tgz
+clean backup log 4
+clean maffra_etc tgz 4
+clean maffra_home tgz 2
 
 
 sudo tar zcfp $WORKINGFOLDER/maffra_etc_$LOGDATE.tgz /etc 2> /dev/null
+sudo tar zcfp $WORKINGFOLDER/maffra_home_$LOGDATE.tgz /home 2> /dev/null
 
 
 log Rsync:
@@ -103,16 +107,16 @@ else
   log Rsync: $DEST could not be found
 fi
 
-log Rsync:
-DEST=/backup
-if ismounted $DEST
-then
-  log Rsync: "$DEST is mounted"
-  log Rsync: "rsync -axv /home/michael $DEST/home/ --delete"
-  nice rsync -axv /home/michael $DEST/home/ --delete | grep -v "/$" >> $LOG 2> /dev/null 
-else
-  log Rsync: "$DEST could not be found"
-fi
+#log Rsync:
+#DEST=/backup
+#if ismounted $DEST
+#then
+#  log Rsync: "$DEST is mounted"
+#  log Rsync: "rsync -axv /home/michael $DEST/home/ --delete"
+#  nice rsync -axv /home/michael $DEST/home/ --delete | grep -v "/$" >> $LOG 2> /dev/null 
+#else
+#  log Rsync: "$DEST could not be found"
+#fi
 
 DATE=$(date)
 ENDTIME=$(date '+%s')
