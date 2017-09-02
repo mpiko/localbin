@@ -1,9 +1,0 @@
-#!/bin/bash
-
-ARCH=$(arch | cut -b1-3)
-if [ $ARCH != "arm" ]
-then
-   echo wrong arch
-else
-  watch "vcgencmd measure_temp; vcgencmd measure_volts"
-fi
