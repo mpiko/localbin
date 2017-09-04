@@ -1,0 +1,8 @@
+#!/bin/bash
+
+cd ~
+
+for i in $(ls ~/Projects)
+do
+  rsync -avPe ssh Projects/$i/ maffra:Projects/$i/
+done
