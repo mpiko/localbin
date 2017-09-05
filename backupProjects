@@ -1,7 +1,0 @@
-#!/bin/bash
-
-rsync -avPe ssh Projects/ maffra:Projects/
-for i in $(ls ~/Projects)
-do
-  rsync -avPe ssh maffra:Projects/$i Projects/
-done
