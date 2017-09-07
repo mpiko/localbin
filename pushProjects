@@ -23,7 +23,7 @@ fi
 if [ -d $PROJECT ]
 then
     echo "Backing up this project on $SERVER"
-    ssh $SERVER "cd Projects; tar zcfp projectbackup/$ME-$DATE-$PROJECT.tgz $PROJECT"
+    ssh $SERVER "cd Projects; [ -d $PROJECT ] && tar zcfp projectbackup/$ME-$DATE-$PROJECT.tgz $PROJECT"
     rsync -avPe ssh $PROJECT/ $SERVER:Projects/$PROJECT/ --delete
 else
     echo "No project \"$PROJECT\" exists"
