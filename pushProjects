@@ -6,6 +6,12 @@ PROJECT=$1
 TMPFILE=/tmp/projectsync.$$
 DATE=$(date '+%d-%m-%y_%H-%M')
 
+if [ $ME == "maffra" ]
+then
+    echo "Please dont create projects on this server"
+    exit 3
+fi
+
 cd ~/Projects
 
 if [ -z $PROJECT ]
