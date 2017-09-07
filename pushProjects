@@ -1,8 +1,27 @@
 #!/bin/bash
 
-cd ~
+ME=$(hostname)
+SERVER=maffra
+PROJECT=$1
+TMPFILE=/tmp/projectsync.$$
+DATE=$(date '+%d-%m-%y_%H-%M')
 
-for i in $(ls ~/Projects)
-do
-  rsync -avPe ssh Projects/$i/ maffra:Projects/$i/
-done
+cd ~/Projects
+
+if [ -z $PROJECT ]
+then
+    echo "Please nominate a project to push"
+    exit 1
+fi
+
+if [ -d $PROJECT ]
+then
+    echo "Backing up this project on $SERVER"
+    ssh $SERVER "cd Projects; tar zcfp projectbackup/$ME-$DATE-$PROJECT.tgz $PROJECT"
+    rsync -avPe ssh $PROJECT/ $SERVER:Projects/$PROJECT/ --delete
+else
+    echo "No project \"$PROJECT\" exists"
+    echo "Here are the available projects:"
+    ls | grep -v projectbackup
+    exit 2
+fi
