@@ -1,0 +1,26 @@
+#!/bin/bash
+
+
+CD="/media/michael/VMware Tools"
+
+if [ -d "$CD" ]
+then
+  ARCHIVE=$(ls "$CD"/V*.tar.gz)
+  sudo rsync -avP "$ARCHIVE" /opt
+fi
+
+TARFILE=$(ls /opt/V*.tar.gz)
+
+cd /opt
+if [ -e $TARFILE ]
+then
+  sudo tar zxvfp $TARFILE
+fi
+if [ -d vmware-tools-distrib ]
+then
+  cd vmware-tools-distrib
+  echo installing
+  sudo ./vmware-install.pl -d
+else
+  echo "No /opt/vmware-tools-distrib found"
+fi
