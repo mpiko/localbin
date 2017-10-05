@@ -12,7 +12,7 @@ then
     exit 3
 fi
 
-cd ~/Projects
+cd /data/Projects
 
 if [ -z $PROJECT ]
 then
@@ -23,8 +23,8 @@ fi
 if [ -d $PROJECT ]
 then
     echo "Backing up this project on $SERVER"
-    ssh $SERVER "cd Projects; [ -d $PROJECT ] && tar zcfp projectbackup/$ME-$DATE-$PROJECT.tgz $PROJECT"
-    rsync -avPe ssh $PROJECT/ $SERVER:Projects/$PROJECT/ --delete
+    ssh $SERVER "cd /data/Projects; [ -d $PROJECT ] && tar zcfp projectbackup/$ME-$DATE-$PROJECT.tgz $PROJECT"
+    rsync -avPe ssh $PROJECT/ $SERVER:/data/Projects/$PROJECT/ --delete
 else
     echo "No project \"$PROJECT\" exists"
     echo "Here are the available projects:"
