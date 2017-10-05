@@ -1,0 +1,10 @@
+#!/bin/bash
+
+DEAD=$(/etc/init.d/ssh status | grep dead | awk '{print $3}')
+
+if [ ! -z $DEAD ]
+then
+  DATE=$(date '+%d-%m-%y_%H-%M')
+  echo "$DATE restarted ssh" >> $HOME/sshrestart.log
+  sudo /etc/init.d/ssh restart
+fi
