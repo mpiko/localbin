@@ -6,13 +6,13 @@ PROJECT=$1
 TMPFILE=/tmp/projectsync.$$
 DATE=$(date '+%d-%m-%y_%H-%M')
 
-if [ $ME == "maffra" ]
+if [ -d $HOME/Projects ]
 then
-    echo "Please dont create projects on this server"
-    exit 3
+    cd $HOME/Projects
+else
+    echo "there are not projects to push"
+    exit 1
 fi
-
-cd /data/Projects
 
 if [ -z $PROJECT ]
 then
