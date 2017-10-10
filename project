@@ -61,6 +61,7 @@ list() {
 
 usage() {
     echo "Usage: $SCRIPT action projectname"
+    echo "   or: $SCRIPT list"
     echo "Actions = pull, push, diff"
     exit 3
 }
