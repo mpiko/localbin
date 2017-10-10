@@ -26,7 +26,7 @@ push() {
     if [ -d $1 ]
     then
         echo "Backing up this project on $SERVER"
-        ssh $SERVER "cd /data/Projects; [ -d $1 ] && tar zcfp projectbackup/$ME-$DATE-$1.tgz $1"
+        ssh $SERVER "cd /data/Projects; [ -d $1 ] && tar zcfp projectbackup/$1-$DATE.tgz $1"
         rsync -avPe ssh $1/ $SERVER:/data/Projects/$1/ --delete
     else
         echo "No project \"$1\" exists"
@@ -41,7 +41,7 @@ pull() {
     then
         cd $HOME/Projects
         [ -d projectbackup ] || mkdir projectbackup
-        tar zcfp projectbackup/$PROJECT_$DATE.tgz $PROJECT
+        tar zcfp projectbackup/$1_$DATE.tgz $1
     fi
     rsync -avPe ssh maffra:/data/Projects/$1 $HOME/Projects/
 }
