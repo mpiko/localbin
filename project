@@ -1,0 +1,94 @@
+#!/bin/bash
+
+ME=$(hostname)
+SERVER=maffra
+PROJECT=$1
+TMPFILE=/tmp/projectsync.$$
+DATE=$(date '+%d-%m-%y_%H-%M')
+SCRIPT=$(basename $0)
+
+push() {
+    if [ -d $HOME/Projects ]
+    then
+        cd $HOME/Projects
+    else
+        echo "there are no projects to push"
+        exit 1
+    fi
+    
+    if [ -z $1 ]
+    then
+        echo "Please nominate a project to push"
+        exit 1
+    fi
+    cd $HOME/Projects
+    
+    if [ -d $1 ]
+    then
+        echo "Backing up this project on $SERVER"
+        ssh $SERVER "cd /data/Projects; [ -d $1 ] && tar zcfp projectbackup/$ME-$DATE-$1.tgz $1"
+        rsync -avPe ssh $1/ $SERVER:/data/Projects/$1/ --delete
+    else
+        echo "No project \"$1\" exists"
+        echo "Here are the available projects:"
+        ls | grep -v projectbackup
+        exit 2
+    fi
+}
+
+pull() {
+    if [ -d $HOME/Projects/$1 ]
+    then
+        cd $HOME/Projects
+        [ -d projectbackup ] || mkdir projectbackup
+        tar zcfp projectbackup/$PROJECT_$DATE.tgz $PROJECT
+    fi
+    rsync -avPe ssh maffra:/data/Projects/$1 $HOME/Projects/
+}
+
+diff() {
+    rsync --delete -avne ssh $HOME/Projects/$1 maffra:/data/Projects/
+}
+
+list() {
+    echo "Available on the server:"
+    ssh $SERVER "cd /data/Projects; ls -d *"
+    echo ""
+    echo "Locally:"
+    cd $HOME/Projects
+    ls -d *
+}
+
+usage() {
+    echo "Usage: $SCRIPT action projectname"
+    echo "Actions = pull, push, diff"
+    exit 3
+}
+
+
+
+if [ $# -eq 0 ]
+then
+    usage
+fi
+if [ $# -eq 1 ] && ! [ $1 == "list" ]
+then
+    usage
+fi
+if [ $# -gt 2 ]
+then
+    usage
+fi
+
+case $1 in
+    pull) 
+        pull $2;;
+    push) 
+        push $2;;
+    diff) 
+        diff $2;;
+    list) 
+        list;;
+    *)
+        usage;;
+esac
