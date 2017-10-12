@@ -36,6 +36,38 @@ push() {
     fi
 }
 
+add() {
+    if [ -d $HOME/Projects ]
+    then
+        cd $HOME/Projects
+    else
+        echo "there are no projects to push"
+        exit 1
+    fi
+    
+    if [ -z $1 ]
+    then
+        echo "Please nominate a project to push"
+        exit 1
+    fi
+    cd $HOME/Projects
+    
+    if [ -d $1 ]
+    then
+        if $(ssh $SERVER "cd /data/Projects; [ -d $1 ]")
+        then
+            echo "Cannot add $1. It already exists"
+        else
+            rsync -avPe ssh $1/ $SERVER:/data/Projects/$1/
+        fi
+    else
+        echo "No project \"$1\" exists"
+        echo "Here are the available projects:"
+        ls | grep -v projectbackup
+        exit 2
+    fi
+}
+
 pull() {
     if [ -d $HOME/Projects/$1 ]
     then
@@ -62,10 +94,9 @@ list() {
 usage() {
     echo "Usage: $SCRIPT action projectname"
     echo "   or: $SCRIPT list"
-    echo "Actions = pull, push, diff"
+    echo "Actions = add, pull, push, diff"
     exit 3
 }
-
 
 
 if [ $# -eq 0 ]
@@ -82,6 +113,8 @@ then
 fi
 
 case $1 in
+    add) 
+        add $2;;
     pull) 
         pull $2;;
     push) 
