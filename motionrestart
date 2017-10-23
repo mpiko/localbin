@@ -1,0 +1,29 @@
+#!/bin/bash
+
+TMP=/tmp/motionrestartcounter
+LOG=/home/michael/motionrestart.log
+RUNNING=$(ps -ax | grep /usr/bin/motion | grep -v grep | head -1 | awk '{print $1}')
+
+if [ -z $RUNNING ]
+then
+  echo restarting
+  DATE=$(date '+%d-%m-%y_%H-%M')
+  echo "$DATE restarted motion" >> $LOG
+  sudo /etc/init.d/motion restart
+  if [ -f $TMP ]
+  then
+      COUNT=$(head -1 $TMP)
+  else
+      COUNT=0
+  fi
+  COUNT=$(expr $COUNT + 1)
+  echo $COUNT > $TMP
+  if [ $COUNT -gt 3 ]
+  then
+      rm $TMP
+      echo "$DATE Rebooting..." >> $LOG
+      sudo reboot
+  fi
+else
+  [ -e $TMP ] && rm $TMP
+fi
