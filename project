@@ -75,7 +75,7 @@ pull() {
         [ -d projectbackup ] || mkdir projectbackup
         tar zcfp projectbackup/$1_$DATE.tgz $1
     fi
-    rsync -avPe ssh maffra:/data/Projects/$1 $HOME/Projects/
+    rsync -avPe ssh maffra:/data/Projects/$1 $HOME/Projects/ --delete
 }
 
 diff() {
