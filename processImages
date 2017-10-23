@@ -1,0 +1,27 @@
+#!/bin/bash
+
+WORKINGDIR=/data/surveillance
+
+cd $WORKINGDIR
+
+if [ $? -ne 0 ]
+then
+    echo "cannot connect to $WORKINGDIR"
+    exit 1
+fi
+
+
+DATE=$(date '+%d-%m-%y_%H-%M')
+echo "$DATE" >> pic_lastrun.log
+
+DAY=$(date '+%d-%m-%y')
+
+[ -d $DAY ] || mkdir $DAY
+[ -d $DAY/image ] || mkdir $DAY/images
+[ -d $DAY/videos ] || mkdir $DAY/videos
+
+
+mv today/*.jpg $DAY/images 2> /dev/null
+mv today/*.avi $DAY/videos 2> /dev/null
+
+find . -type d -mtime +30 | xargs rm -rf
