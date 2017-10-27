@@ -1,6 +1,9 @@
 #!/bin/bash
 
 WORKINGDIR=/data/surveillance
+TAR=7
+DEL=365
+LOG=$(basename $0).log
 
 cd $WORKINGDIR
 
@@ -12,7 +15,7 @@ fi
 
 
 DATE=$(date '+%d-%m-%y_%H-%M')
-echo "$DATE" >> pic_lastrun.log
+echo "$DATE" >> $LOG
 
 DAY=$(date '+%d-%m-%y')
 
@@ -24,4 +27,12 @@ DAY=$(date '+%d-%m-%y')
 mv today/*.jpg $DAY/images 2> /dev/null
 mv today/*.avi $DAY/videos 2> /dev/null
 
-find . -type d -mtime +30 | xargs rm -rf
+# archive some of the older folders
+for i in $(find . -maxdepth 1 -type d -mtime +$TAR | sed 's#^./##')
+do
+    tar zcvfp $i.tgz $i
+    rm -rf $i
+done
+
+# Delete very old stuff
+find . -type d -mtime +$DEL | xargs rm -rf
