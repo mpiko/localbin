@@ -107,16 +107,16 @@ else
   log Rsync: $DEST could not be found
 fi
 
-#log Rsync:
-#DEST=/backup
-#if ismounted $DEST
-#then
-#  log Rsync: "$DEST is mounted"
-#  log Rsync: "rsync -axv /home/michael $DEST/home/ --delete"
-#  nice rsync -axv /home/michael $DEST/home/ --delete | grep -v "/$" >> $LOG 2> /dev/null 
-#else
-#  log Rsync: "$DEST could not be found"
-#fi
+DEST=/share
+if ismounted $DEST
+then
+  log Rsync: $DEST is mounted
+  log Rsync: "rsync -axv / $DEST/maffraRoot/ --delete"
+  nice sudo rsync -axv / $DEST/maffraRoot/ --delete | grep -v "/$" >> $LOG 2> /dev/null 
+else
+  log Rsync: $DEST could not be found
+fi
+
 
 DATE=$(date)
 ENDTIME=$(date '+%s')
