@@ -34,5 +34,8 @@ do
     rm -rf $i
 done
 
+#clean up any folders that were missed.
+find . -type d -mtime +$TAR | xargs rm -rf
+
 # Delete very old stuff
-find . -type d -mtime +$DEL | xargs rm -rf
+find . -mtime +$DEL | xargs rm -rf
