@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# to get the week number for use with my Juke Joint downloads. This number becomes the track number.
+
+
+D=$(date +%W)
+
+D=$(calc $D -1| sed 's/\t\+//g')
+
+echo -n "Track #: "
+
+if [ $D -lt 10 ]
+then
+    echo "0$D"
+else
+    echo $D
+fi
