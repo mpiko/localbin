@@ -3,11 +3,11 @@
 LOG=~/wlan0.log
 NOW=$(date)
 
-ifconfig wlan0 > /dev/null 2>&1
+/sbin/ifconfig wlan0 > /dev/null 2>&1
 if [ $? -eq 0 ]
 then
   echo "$NOW: up" >> $LOG
 else
   echo "$NOW: down. rebooting" >> $LOG
-  reboot
+  /sbin/reboot 2> $LOG
 fi
