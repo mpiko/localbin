@@ -1,3 +1,3 @@
 #!/bin/bash
 
-sudo rsync -avx / /sysbackup > /dev/null 2>&1
+sudo rsync -ax --delete / /sysbackup > /dev/null 2>&1
