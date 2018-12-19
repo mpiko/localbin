@@ -1,0 +1,78 @@
+#!/bin/bash
+
+# download the latest Avon River hights at the Channel from BoM
+# test the low warning and high warning levels.
+# apparently 2.6 is when the bridge becomes impassable.
+
+LOW=1.34
+HIGH=1.4
+
+USER=avon
+PASS=river
+
+LAST=0
+COUNT=0
+IFS="
+"
+cd /tmp
+
+wget http://www.bom.gov.au/fwo/IDV67203/IDV67203.085276.tbl.shtml
+
+updateDB() {
+    DAY=$(echo $1 | cut -f1 -d" ")
+    D=$(echo $DAY | cut -f1 -d-)
+    M=$(echo $DAY | cut -f2 -d-)
+    Y=$(echo $DAY | cut -f3 -d-)
+    DAY=$Y-$M-$D
+    TIME=$(echo $1 | cut -f2 -d" ")
+    VAL=$(echo $1 | cut -f3 -d" ")
+    HITS=$(mysql -u$USER -p$PASS -D avonriver -BNe "select count(date) from riverdata where date=\"$DAY $TIME\"; " 2> /dev/null)
+    if [ $HITS -eq 0 ]
+    then
+        mysql -u$USER -p$PASS -D avonriver -BNe "insert into riverdata values(\"$DAY $TIME\",\"$VAL\");" 2> /dev/null
+        echo "DB Updated"
+    fi
+}
+
+trend() {
+    NOW=$1
+    PREV=$2
+    if [ $(calc $NOW \> $PREV) -eq 1 ]
+    then
+        echo "$STRING RISING "
+    elif [ $(calc $NOW \< $PREV) -eq 1 ]
+    then
+        echo "$STRING FALLING "
+    else
+        echo "$STRING STABLE "
+    fi
+}
+
+for i in $(grep '^<td' IDV67203.085276.tbl.shtml | sed 's/<td align=//g' | sed 's/left>//g' | sed 's/right>//g'| sed 's/<\/td>//g')
+do
+    COUNT=$(expr $COUNT + 1)
+    if [ $(calc $COUNT \/ 2 | grep "\.") ]
+    then
+        # its an odd number
+        # only even numbered lines have the hight value.
+
+        STRING=$(echo $i | sed 's#/#-#g')
+        continue
+    else
+        STRING="$STRING $i "
+        updateDB $STRING
+        if [ $(calc $i \> $HIGH) -eq 1 ]
+        then
+            STRING="$STRING WARNING: HIGH "
+        elif [ $(calc $i \> $LOW) -eq 1 ]
+        then
+            STRING="$STRING WARNING: LOW "
+        else
+            STRING="$STRING OK "
+        fi
+        trend $i $LAST;
+        LAST=$i
+        
+    fi
+done
+rm IDV67203.085276.tbl.shtml*
