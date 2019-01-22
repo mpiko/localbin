@@ -7,8 +7,13 @@
 LOW=1.34
 HIGH=1.4
 
-USER=avon
-PASS=river
+if [ -e ~/localbin/.secrets ]
+then
+    . ~/localbin/.secrets
+else
+    echo "cannot find secrets. Exiting"
+    exit 1
+fi
 
 LAST=0
 COUNT=0
