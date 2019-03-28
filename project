@@ -1,7 +1,8 @@
 #!/bin/bash
 
 ME=$(hostname)
-SERVER=maffra
+SERVER=avon
+REMOTELOCAL=/data/Projects
 PROJECT=$1
 TMPFILE=/tmp/projectsync.$$
 DATE=$(date '+%d-%m-%y_%H-%M')
@@ -26,8 +27,8 @@ push() {
     if [ -d $1 ]
     then
         echo "Backing up this project on $SERVER"
-        ssh $SERVER "cd /data/Projects; [ -d $1 ] && tar zcfp projectbackup/$1-$DATE.tgz $1"
-        rsync -avPe ssh $1/ $SERVER:/data/Projects/$1/ --delete
+        ssh $SERVER "cd $REMOTELOCAL; [ -d $1 ] && tar zcfp projectbackup/$1-$DATE.tgz $1"
+        rsync -avPe ssh $1/ $SERVER:$REMOTELOCAL/$1/ --delete
     else
         echo "No project \"$1\" exists"
         echo "Here are the available projects:"
@@ -54,11 +55,11 @@ add() {
     
     if [ -d $1 ]
     then
-        if $(ssh $SERVER "cd /data/Projects; [ -d $1 ]")
+        if $(ssh $SERVER "cd $REMOTELOCAL; [ -d $1 ]")
         then
             echo "Cannot add $1. It already exists"
         else
-            rsync -avPe ssh $1/ $SERVER:/data/Projects/$1/
+            rsync -avPe ssh $1/ $SERVER:$REMOTELOCAL/$1/
         fi
     else
         echo "No project \"$1\" exists"
@@ -75,16 +76,16 @@ pull() {
         [ -d projectbackup ] || mkdir projectbackup
         tar zcfp projectbackup/$1_$DATE.tgz $1
     fi
-    rsync -avPe ssh maffra:/data/Projects/$1 $HOME/Projects/ --delete
+    rsync -avPe ssh $SERVER:$REMOTELOCAL/$1 $HOME/Projects/ --delete
 }
 
 diff() {
-    rsync --delete -avne ssh $HOME/Projects/$1 maffra:/data/Projects/
+    rsync --delete -avne ssh $HOME/Projects/$1 $SERVER:$REMOTELOCAL/
 }
 
 list() {
     echo "Available on the server:"
-    ssh $SERVER "cd /data/Projects; ls -d *"
+    ssh $SERVER "cd $REMOTELOCAL; ls -d *"
     echo ""
     echo "Locally:"
     cd $HOME/Projects
