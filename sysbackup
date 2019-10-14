@@ -1,3 +1,4 @@
 #!/bin/bash
 
 sudo rsync -ax --delete / /sysbackup > /dev/null 2>&1
+sudo rsync -ax --delete -e ssh / data:/data/avon/ > /dev/null 2>&1
