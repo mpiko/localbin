@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# download the latest Avon River hights at the Channel from BoM
+# download the latest Avon River heights at the Channel from BoM
 # test the low warning and high warning levels.
 # apparently 2.6 is when the bridge becomes impassable.
 
@@ -59,7 +59,7 @@ do
     if [ $(calc $COUNT \/ 2 | grep "\.") ]
     then
         # its an odd number
-        # only even numbered lines have the hight value.
+        # only even numbered lines have the height value.
 
         STRING=$(echo $i | sed 's#/#-#g')
         continue

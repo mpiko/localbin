@@ -5,7 +5,7 @@ use avonriver;
 
 CREATE TABLE riverdata (
     date        datetime,
-    hight    float
+    height    float
 );
 
 DROP USER IF EXISTS 'avon'@'localhost';
