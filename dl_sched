@@ -6,6 +6,8 @@
 cd ~/Downloads
 
 LIST=URL.list
+LOG=~/.dl_sched.log
+
 
 if [ ! -e $LIST ]
 then
@@ -26,7 +28,9 @@ do
         echo "File already downloaded: $FILE"
     else
         echo "Getting $FILE from $URL"
-        wget -c $URL
+        wget -c $URL > /dev/null 2>&1
+        DATE=$(date '+%d-%m-%y_%H-%M')
+        echo "$DATE $URL" >> $LOG
     fi
 done
 echo "" > $LIST
