@@ -1,0 +1,32 @@
+#!/bin/bash
+#
+# crontab entry
+# 0 2 * * * /home/michael/localbin/dl_sched > /dev/null
+
+cd ~/Downloads
+
+LIST=URL.list
+
+if [ ! -e $LIST ]
+then
+    # nothing to do.
+    exit
+fi
+
+for URL in $(cat $LIST)
+do
+    # get the file name
+    for PART in $(echo $URL | sed 's#/# #g')
+    do
+       FILE=$PART
+    done
+    #echo $FILE
+    if [ -e $FILE ]
+    then
+        echo "File already downloaded: $FILE"
+    else
+        echo "Getting $FILE from $URL"
+        wget -c $URL
+    fi
+done
+echo "" > $LIST
