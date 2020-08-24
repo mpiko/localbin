@@ -1,0 +1,18 @@
+#!/bin/bash
+
+KEEPALIVE=/data/.keepalive
+LOG=~/.datakeepalive.log
+
+ls /data > /dev/null 2>&1
+
+if [ $? -eq 0 ]
+then
+    touch $KEEPALIVE
+    sleep 1
+    rm $KEEPALIVE
+    #NOW=$(date +"%Y-%m-%d %T")
+    #echo "$NOW /data is fine" >> $LOG
+else
+    NOW=$(date +"%Y-%m-%d %T")
+    echo "$NOW /data is not accessible" >> $LOG
+fi
