@@ -1,0 +1,10 @@
+#!/bin/bash
+
+if [ -e ~/localbin/.secrets ]
+then
+    . ~/localbin/.secrets
+else
+    echo "cannot find secrets. Exiting"
+    exit 1
+fi
+mysql -u$USER -p$PASS -D avonriver -BNe "$@"
