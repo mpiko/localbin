@@ -28,7 +28,7 @@ push() {
     then
         echo "Backing up this project on $SERVER"
         ssh $SERVER "cd $REMOTELOCAL; [ -d $1 ] && tar zcfp projectbackup/$1-$DATE.tgz $1"
-        rsync -avPe ssh $1/ $SERVER:$REMOTELOCAL/$1/ --delete
+        rsync -rvPe ssh $1/ $SERVER:$REMOTELOCAL/$1/ --delete
     else
         echo "No project \"$1\" exists"
         echo "Here are the available projects:"
@@ -59,7 +59,7 @@ add() {
         then
             echo "Cannot add $1. It already exists"
         else
-            rsync -avPe ssh $1/ $SERVER:$REMOTELOCAL/$1/
+            rsync -rvPe ssh $1/ $SERVER:$REMOTELOCAL/$1/
         fi
     else
         echo "No project \"$1\" exists"
@@ -76,11 +76,11 @@ pull() {
         [ -d projectbackup ] || mkdir projectbackup
         tar zcfp projectbackup/$1_$DATE.tgz $1
     fi
-    rsync -avPe ssh $SERVER:$REMOTELOCAL/$1 $HOME/Projects/ --delete
+    rsync -rvPe ssh $SERVER:$REMOTELOCAL/$1 $HOME/Projects/ --delete
 }
 
 diff() {
-    rsync --delete -avne ssh $HOME/Projects/$1 $SERVER:$REMOTELOCAL/
+    rsync --delete -rvne ssh $HOME/Projects/$1 $SERVER:$REMOTELOCAL/
 }
 
 list() {
