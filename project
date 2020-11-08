@@ -26,9 +26,16 @@ push() {
     
     if [ -d $1 ]
     then
-        echo "Backing up this project on $SERVER"
-        ssh $SERVER "cd $REMOTELOCAL; [ -d $1 ] && tar zcfp projectbackup/$1-$DATE.tgz $1"
-        rsync -rvPe ssh $1/ $SERVER:$REMOTELOCAL/$1/ --delete
+        if [ ssh $SERVER "[ -d $1 ]" ]
+        then
+            echo "Backing up this project on $SERVER"
+            ssh $SERVER "cd $REMOTELOCAL; [ -d $1 ] && tar zcfp projectbackup/$1-$DATE.tgz $1"
+            rsync -rvPe ssh $1/ $SERVER:$REMOTELOCAL/$1/ --delete
+        else
+            echo "project does not exist on $SERVER"
+            echo "if this is a new project, please use \"project add\" first"
+            exit 2
+        fi
     else
         echo "No project \"$1\" exists"
         echo "Here are the available projects:"
