@@ -26,7 +26,7 @@ push() {
     
     if [ -d $1 ]
     then
-        if [ $(ssh $SERVER "[ -d $1 ]") ]
+        if ( $(ssh $SERVER "[ -d $REMOTELOCAL/$1 ]") )
         then
             echo "Backing up this project on $SERVER"
             ssh $SERVER "cd $REMOTELOCAL; [ -d $1 ] && tar zcfp projectbackup/$1-$DATE.tgz $1"
