@@ -35,7 +35,7 @@ do
         if [[ $URL =~ youtu ]]
         then
            echo youtube
-           youtube_dl $URL
+           youtube-dl $URL
         else
            echo "Getting $FILE from $URL"
            wget -c $URL > /dev/null 2>&1
