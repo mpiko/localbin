@@ -3,6 +3,11 @@
 # crontab entry
 # 0 2 * * * /home/michael/localbin/dl_sched > /dev/null
 
+# Example URL.list:
+# https://youtu.be/G-zY2rCceis
+# http://blah.com.au/file1.iso
+
+
 cd ~/Downloads
 
 LIST=URL.list
@@ -27,10 +32,16 @@ do
     then
         echo "File already downloaded: $FILE"
     else
-        echo "Getting $FILE from $URL"
-        wget -c $URL > /dev/null 2>&1
-        DATE=$(date '+%d-%m-%y_%H-%M')
-        echo "$DATE $URL" >> $LOG
+        if [[ $URL =~ youtu ]]
+        then
+           echo youtube
+           youtube_dl $URL
+        else
+           echo "Getting $FILE from $URL"
+           wget -c $URL > /dev/null 2>&1
+           DATE=$(date '+%d-%m-%y_%H-%M')
+           echo "$DATE $URL" >> $LOG
+        fi
     fi
 done
-echo "" > $LIST
+#echo "" > $LIST
