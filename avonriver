@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 # download the latest Avon River heights at the Channel from BoM
 # test the low warning and high warning levels.
 # apparently 2.6 is when the bridge becomes impassable.
