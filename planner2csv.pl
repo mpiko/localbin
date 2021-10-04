@@ -10,6 +10,10 @@
 #
 # Usage: planner2csv.pl <file> > out.csv
 
+# Michael:
+# sudo apt install -y libtext-csv-xs-perl
+
+
 use XML::LibXML;
 use Text::CSV_XS;
 
