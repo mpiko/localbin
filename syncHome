@@ -1,0 +1,36 @@
+#!/bin/bash
+
+ME=$(basename $0)
+LOCK=/home/michael/.$ME.lock
+
+ping -c 1 nas > /dev/null 2>&1
+if [ $? -ne 0 ]
+then
+    echo "Cannot find nas. Maybe we are not at home!"
+    exit 1
+fi
+
+
+if [ -e $LOCK ]
+then
+    echo "Lock exists: $LOCK"
+    LOCKPID=$(head -1 $LOCK)
+    echo LOCKPID = $LOCKPID
+    if [ ! -z $(ps ax | grep -v grep | grep $LOCKPID | gawk '{print $1}') ]
+    then
+        echo "looks like an instance is already running: $LOCKPID"
+        exit 1
+    fi
+
+    # the lock appears to be stale.
+    rm $LOCK
+fi
+
+# set up the lock
+echo $$ > $LOCK
+
+# go.
+nice rsync --delete -avPe ssh /home/michael/ nas:share/
+
+# remove the lock
+rm $LOCK
