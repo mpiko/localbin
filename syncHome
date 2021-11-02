@@ -13,16 +13,15 @@ fi
 
 if [ -e $LOCK ]
 then
-    echo "Lock exists: $LOCK"
+    #echo "Lock exists: $LOCK"
     LOCKPID=$(head -1 $LOCK)
-    echo LOCKPID = $LOCKPID
+    #echo LOCKPID = $LOCKPID
     if [ ! -z $(ps ax | grep -v grep | grep $LOCKPID | gawk '{print $1}') ]
     then
-        echo "looks like an instance is already running: $LOCKPID"
+        echo "Instance is already running: $LOCKPID"
         exit 1
     fi
-
-    # the lock appears to be stale.
+    echo "Removing stale lock: $LOCK $LOCKPID"
     rm $LOCK
 fi
 
