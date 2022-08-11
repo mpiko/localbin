@@ -29,7 +29,7 @@ fi
 echo $$ > $LOCK
 
 # go.
-nice rsync --delete -avPe ssh /home/michael/ nas:share/
+nice rsync --delete -avxPe ssh /home/michael/ nas:/common/sync/mate/
 
 # remove the lock
 rm $LOCK
