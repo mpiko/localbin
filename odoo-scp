@@ -1,0 +1,7 @@
+#!/bin/bash
+
+SERVER=$1
+ZIP=$2
+
+
+scp $ZIP  $SERVER:odoo-multi/tpa/zips/
