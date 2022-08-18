@@ -3,6 +3,18 @@
 ME=$(basename $0)
 LOCK=/home/michael/.$ME.lock
 
+GO=false
+for NET in $(hostname -I)
+do
+   [ $NET == "10.0.0.4" ] && GO=true
+   [ $NET == "10.0.0.5" ] && GO=true
+done
+
+if ! [ $GO = true ]
+then
+    exit
+fi
+
 ping -c 1 nas > /dev/null 2>&1
 if [ $? -ne 0 ]
 then
@@ -29,7 +41,7 @@ fi
 echo $$ > $LOCK
 
 # go.
-nice rsync --delete -avxPe ssh /home/michael/ nas:/common/sync/mate/
+nice rsync --delete -avxPe ssh /home/michael/ nas:/common/sync/hourly/mate/ --exclude VMs
 
 # remove the lock
 rm $LOCK
